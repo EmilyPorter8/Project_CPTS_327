@@ -1,0 +1,10 @@
+{% extends "base.html" %} {% block content %}
+<h1>Inventory Management</h1>
+<ul>
+    {% for InventoryItem in InventoryItems %}
+    <li>
+        {{InventoryItem.title}}, {{InventoryItem.amount}}, {{InventoryItem.date}}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
