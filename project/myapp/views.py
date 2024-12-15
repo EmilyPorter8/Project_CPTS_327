@@ -2,11 +2,12 @@ import random
 from django.shortcuts import render, redirect, HttpResponse
 from .models import InventoryItem
 # Create your views here.
-from .forms import SignUpForm, LogInForm, CodeCheckForm
+from .forms import SignUpForm, LogInForm, CodeCheckForm, InventoryItemForm
 from django.core.mail import send_mail
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 # pretend this is an actual database.
 code_database = {}
@@ -75,3 +76,17 @@ def SignUp(request):
         form= SignUpForm()
 
     return render(request, 'signup.html', {'form':form})
+
+@login_required
+def AddItem(request):
+    if request.method == 'POST':     # form has been submitted
+        form = InventoryItemForm(request.POST)
+
+        if form.is_valid():
+            form.save() # save the user in database.
+
+            return redirect('InventoryItem')
+    else:
+        form= InventoryItemForm()
+
+    return render(request, 'AddItem.html', {'form':form})

@@ -5,5 +5,4 @@ from django.db import models
 class InventoryItem(models.Model):
     title = models.CharField(max_length = 200)
     amount = models.PositiveBigIntegerField()
-    # ID = models.PositiveBigIntegerField()
     date = models.DateField()

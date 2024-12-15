@@ -1,0 +1,18 @@
+{% extends "base.html" %} {% block title %} Add Item Page {% endblock %}
+{% block content %}
+<p>Add Item</p>
+<form method = "post" action = ".">
+    {% comment %} this is intresting because it is meant to prevent cross site forgery {% endcomment %}
+    {% csrf_token %} 
+    {{form.as_p}}
+    {% if form.errors or form.non_field_errors %}
+    <div class = "Error_box">
+        {% for field in form %}
+        {{field.errors}}
+        {% endfor %}
+        {{form.non_field_errors}}
+    </div>
+    {% endif %}
+    <button>Submit</button>
+</form>
+{% endblock %}

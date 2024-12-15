@@ -9,5 +9,6 @@ urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'),
     path("email/", views.SendEmailView, name = "email"),
     path("codecheck/", views.SendEmailView, name = "codecheck"), # for chekcing the code.
-    path("InventoryManager/", views.InventoryItems, name = "InventoryItem")
+    path("InventoryManager/", views.InventoryItems, name = "InventoryItem"),
+    path("AddItem/", views.AddItem, name = "additem"),
 ]
