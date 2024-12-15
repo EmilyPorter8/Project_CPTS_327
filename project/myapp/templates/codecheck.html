@@ -1,0 +1,12 @@
+{% extends "base.html" %} {% block title %} Check code {% endblock %}
+{% block content %}
+<p>Please enter code from email</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enter</button>
+    {% if error %}
+        <p>{{ error }}</p>
+    {% endif %}
+</form>
+{% endblock %}

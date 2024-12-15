@@ -6,6 +6,13 @@ class LogInForm(AuthenticationForm):
         username= forms.CharField(widget=forms.TextInput())
         password= forms.CharField(widget=forms.PasswordInput)
 
+class CodeCheckForm(forms.Form):
+    code = forms.CharField(
+        max_length=6, 
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': 'enter code'})
+    )
+     
 
 class SignUpForm(UserCreationForm):
     class Meta:

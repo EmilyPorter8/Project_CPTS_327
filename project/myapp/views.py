@@ -1,33 +1,69 @@
+import random
 from django.shortcuts import render, redirect, HttpResponse
 from .models import InventoryItem
 # Create your views here.
-from .forms import SignUpForm
+from .forms import SignUpForm, LogInForm, CodeCheckForm
 from django.core.mail import send_mail
+from django.contrib.auth.views import LoginView
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
 
-def send_email_view(request):
+# pretend this is an actual database.
+code_database = {}
+
+def SendEmailView(request):
+    user_id = request.session.get('user_id')
+    error = None
+    if user_id not in code_database:
+        return redirect('login')
+
     if request.method == 'POST':
-        send_mail(
-            'Test Subject',
-            'This is a test email from Django!',
-            'cpts327inventoryapp@gmail.com',  # From email
-            ['emily.l.porter@wsu.edu'],  # To email
-            fail_silently=False,
-        )
-        return render(request, 'email_sent.html')  # A confirmation template
-    return render(request, 'send_email.html')  # A form to trigger the email
+        form = CodeCheckForm(request.POST)
+        if form.is_valid():
+            entered_code = request.POST['code']
+            code = code_database[user_id]
+            
+            if (entered_code == code['code']):
+                user = User.objects.get(pk=user_id)
+                login(request, user)
+                del code_database[user_id]
+                return redirect('home')
+        else:
+            return render(request, 'codecheck.html', {'error': 'wrong code.'})
+    else:
+        form = CodeCheckForm()
+    return render(request, 'codecheck.html', {'form':form})
 
+def send_email(user, code):
+    subject = 'Email authentication from Inventory app'
+    message = f'Your code is {code}.'
+    from_email = 'cpts327inventoryapp@gmail.com'
+    recipient_list = [user.email]
+    send_mail(subject, message, from_email, recipient_list)
 
-def home(request):
+def Home(request):
     return render(request, "home.html")
 
-def login(request):
-    return render(request, "login.html")
+
+class CustomLoginView(LoginView):
+    template_name = 'login.html'
+    authentication_form = LogInForm
+    # makes one time pasword
+    def make_code(self):
+        return str(random.randint(100000, 999999))
+    def form_valid(self, form):
+        user = form.get_user()        
+        code = self.make_code()
+        code_database[user.id] = {'code': code}
+        send_email(user, code) # send the email.
+        self.request.session['user_id'] = user.id
+        return redirect('codecheck')
 
 def InventoryItems(request):
     items = InventoryItem.objects.all()
     return render(request, "InventoryItem.html", {"InventoryItems":items})
 
-def signup(request):
+def SignUp(request):
     if request.method == 'POST':     # form has been submitted
         form = SignUpForm(request.POST)
 
